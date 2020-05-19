@@ -8,7 +8,7 @@ class CalculatorScreen extends StatefulWidget {
 }
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
-  String input = "24/32";
+  String input = "0";
   String output = "";
   Color _color = Color(0xEE6982E6);
   double _width = 10.0;
@@ -104,7 +104,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       children: <Widget>[
         _functButton("CE", () {
           setState(() {
-            cleanDisplay();
+            clearDisplay();
           });
         }),
         _functButton("-", () {
@@ -148,8 +148,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  void cleanDisplay() {
-    this.input = "";
+  void clearDisplay() {
+    this.input = "0";
     this.output = "";
   }
 
@@ -262,6 +262,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
+          if (this.input.length == 1 && number != 0 && this.input[0] == "0") {
+            this.input = "";
+          }
           this.input = this.input + number.toString();
         });
       },
