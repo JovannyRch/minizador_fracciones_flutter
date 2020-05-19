@@ -1,4 +1,4 @@
-package com.example.minimizador_fracciones
+package com.jovannyrch.minimizador_fracciones
 
 import io.flutter.embedding.android.FlutterActivity
 
