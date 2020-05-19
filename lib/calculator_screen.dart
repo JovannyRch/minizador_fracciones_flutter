@@ -15,6 +15,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   double _height = 10.0;
   double _fontSize = 35;
   double kWidth = 0.17;
+  String mcd = "";
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +24,17 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     _height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      key: _scaffoldKey,
       body: SafeArea(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _displayScreen(),
               _keys(),
+              Text(
+                'jovannyrch.com',
+                style: TextStyle(color: Colors.grey.shade300),
+              ),
             ]),
       ),
     );
@@ -38,25 +45,31 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         padding: EdgeInsets.symmetric(horizontal: 30.0),
         height: _height * 0.3,
         width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Text(
+        child: SingleChildScrollView(
+          reverse: true,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Text(
                 output,
-                style: TextStyle(color: Colors.grey, fontSize: 55.0),
+                style: TextStyle(color: Colors.grey, fontSize: 30.0),
               ),
-            ),
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Text(
+              SizedBox(height: 10.0),
+              Text(
                 input,
-                style: TextStyle(color: _color, fontSize: 80.0),
+                style: TextStyle(
+                  color: _color,
+                  fontSize: 65.0,
+                ),
+                textAlign: TextAlign.end,
               ),
-            )
-          ],
+              Text(
+                this.output.length > 0 ? "Mayor factor común:  $mcd" : "",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
         ));
   }
 
@@ -155,19 +168,39 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return x;
   }
 
+  void showMsg(String msg) {
+    _scaffoldKey.currentState
+        .showSnackBar(new SnackBar(content: new Text(msg)));
+  }
+
   Widget _equalButton() {
     return GestureDetector(
       onTap: () {
         if (this.input.contains("/")) {
           List<String> numbers = this.input.split("/");
+          print(numbers);
+          if (numbers[0] == "" || numbers[1] == "") {
+            showMsg("Datos incompletos");
+            return;
+          }
+
           int a = int.parse(numbers[0]);
           int b = int.parse(numbers[1]);
+
           int mcd = this.MCD(a, b);
-          print("Dividir entre $mcd");
+          if (b == 0) {
+            showMsg("Recuerda que la división entre 0 no existe");
+            return;
+          } else if (mcd == 1) {
+            showMsg("La fracción ya no se puede simplificar más");
+          }
           setState(() {
+            this.mcd = "$mcd";
             this.output = this.input.toString() + '';
             this.input = "${a ~/ mcd}/${b ~/ mcd}";
           });
+        } else {
+          showMsg("Agrega el denominador");
         }
       },
       child: Container(
