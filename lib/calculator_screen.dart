@@ -108,9 +108,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           });
         }),
         _functButton("-", () {
-          setState(() {
-            this.input += "-";
-          });
+          if (this.input.length == 1 && this.input[0] == "0") {
+            setState(() {
+              this.input = "-";
+            });
+          } else {
+            setState(() {
+              this.input += "-";
+            });
+          }
         }),
         _functButton("/", () {
           if (!this.input.contains("/")) {

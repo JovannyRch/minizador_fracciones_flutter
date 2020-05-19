@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
     return MaterialApp(
-      title: 'Mimizador de Fracciones',
+      title: 'Simplificar Fracciones',
       debugShowCheckedModeBanner: false,
       home: CalculatorScreen(),
     );
