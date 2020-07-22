@@ -1,4 +1,8 @@
+import 'package:admob_flutter/admob_flutter.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:minimizador_fracciones/services/Admob.dart';
+import 'package:launch_review/launch_review.dart';
 
 class CalculatorScreen extends StatefulWidget {
   CalculatorScreen({Key key}) : super(key: key);
@@ -16,7 +20,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   double _fontSize = 35;
   double kWidth = 0.17;
   String mcd = "";
+  AdmobInterstitial interstitialAd;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    Admob.initialize(AdmobService.getAdmobId(isTesting: false));
+    interstitialAd = AdmobInterstitial(
+      adUnitId: AdmobService.videoId(isTesting: false),
+    );
+    interstitialAd.load();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +41,75 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return Scaffold(
       key: _scaffoldKey,
       body: SafeArea(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _displayScreen(),
-              _keys(),
-              Text(
-                'jovannyrch.com',
-                style: TextStyle(color: Colors.grey.shade300),
-              ),
-            ]),
+        child: Stack(
+          children: <Widget>[
+            _mainUI(),
+            _rateApp(),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _mainUI() {
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      _displayScreen(),
+      _keys(),
+      Text(
+        'jovannyrch.com',
+        style: TextStyle(color: Colors.grey.shade300),
+      ),
+    ]);
+  }
+
+  Widget _rateApp() {
+    return Positioned(
+      right: 10.0,
+      child: GestureDetector(
+        onTap: () {
+          this.callReview();
+        },
+        child: Container(
+          width: 150.0,
+          padding: EdgeInsets.all(2.0),
+          margin: EdgeInsets.only(top: 15.0),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: _color,
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.star,
+                color: _color,
+              ),
+              SizedBox(
+                width: 5.0,
+              ),
+              Text(
+                "Califica la app",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: _color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17.0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void callReview() {
+    LaunchReview.launch(
+        androidAppId: "com.jovannyrch.minimizador_fracciones",
+        iOSAppId: "585027354");
   }
 
   Widget _displayScreen() {
@@ -181,8 +253,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   Widget _equalButton() {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (this.input.contains("/")) {
+          if (await interstitialAd.isLoaded) {
+            interstitialAd.show();
+          } else {
+            print("Sigue cargando ");
+          }
           List<String> numbers = this.input.split("/");
           print(numbers);
           if (numbers[0] == "" || numbers[1] == "") {

@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:minimizador_fracciones/calculator_screen.dart';
 import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  return runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
